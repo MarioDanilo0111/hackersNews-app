@@ -9,8 +9,14 @@
     <title>Hacker News</title>
   </head>
   <body>
-    <input type="text" id="searchInput" placeholder="Enter title..." />
-    <button id="searchButton">Search</button>
+    <div class="input-container">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Enter your search term..."
+      />
+      <button id="searchButton">Search</button>
+    </div>
     <div type="text" id="searchResult"></div>
     <div id="app" class="container"></div>
     <script type="module" src="/src/main.ts"></script>

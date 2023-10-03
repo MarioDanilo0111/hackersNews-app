@@ -9,6 +9,24 @@ const searchButton = document.querySelector<HTMLButtonElement>("#searchButton");
 const searchResult = document.querySelector<HTMLUListElement>("#searchResult")!;
 
 let news: NewsType[] = [];
+
+/* formating date */
+function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Month is 0-indexed
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+const hourCreated = (dataString: string): string => {
+  const date = new Date(dataString);
+  const hour = date.getHours();
+  const min = date.getMinutes();
+  return `${hour}:${min}`;
+};
+
 const getNew = async (searchTerm?: string) => {
   // Fetch todos from server and update local copy
   try {
@@ -20,8 +38,16 @@ const getNew = async (searchTerm?: string) => {
     if (searchTerm && news && news.hits && Array.isArray(news.hits)) {
       const searchResults = news.hits.filter((hit) => {
         if (
-          hit.title &&
-          hit.title.toLowerCase().includes(searchTerm.toLowerCase())
+          (hit.title &&
+            hit.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          hit.author.toLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
+          hit.created_at
+            .toLowerCase()
+            .includes(searchTerm.toLocaleLowerCase()) ||
+          hit.points
+            .toString()
+            .toLowerCase()
+            .includes(searchTerm.toLocaleLowerCase())
         ) {
           return hit.title;
         } else {
@@ -60,12 +86,13 @@ const renderNews = () => {
         (hit: NewsType["hits"][0]) =>
           `<main >
         <div class="link-item">
-          <a href="${hit.url}" class="link" target="_blank">
+          <a href="${hit.url}" class="link" >
           <h3>${hit.title}</h3>
           </a>
-          <h3>${hit.points}</h3>
-          <h3>${hit.created_at}</h3>                  
-          <p>${hit._highlightResult.author.value} points</p>
+          <h3>Points: ${hit.points}</h3>
+          <h3>Created at: ${formatDate(hit.created_at)}</h3>
+          <h3>Exact time: ${hourCreated(hit.created_at)}</h3>
+          <p>Author: ${hit.author} </p>
           </div>
           </main>`
       )
@@ -85,8 +112,8 @@ function displaySearchResult(searchResults: NewsType["hits"][0][]) {
       <h3>${hit.title}</h3>
       </a>
       <h3>${hit.points}</h3>
-      <h3>${hit.created_at}</h3>
-      <p>${hit._highlightResult.author.value} points</p>
+      <h3>${formatDate(hit.created_at)}</h3>
+      <p>${hit._highlightResult.author.value} </p>
       </div>
       </main>
       `;
@@ -115,22 +142,3 @@ searchInput?.addEventListener("keydown", async (event) => {
 });
 
 getNew();
-
-/* const getNew = async () => {
-  // Fetch todos from server and update local copy
-  try {
-    news = await getNews();
-    renderNews();
-
-    console.log(news);
-    // Render todos
-  } catch (err) {
-    if (err instanceof AxiosError) {
-      alert(err.isAxiosError);
-    } else if (err instanceof Error) {
-      alert(err.message);
-    } else {
-      alert("This should never happen.");
-    }
-  }
-}; */
