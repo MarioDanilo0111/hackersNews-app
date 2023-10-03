@@ -32,30 +32,29 @@ const getNew = async (searchTerm?: string) => {
   try {
     news = await getNews();
 
-    // Render News
     // Add search functionality here
-
     if (searchTerm && news && news.hits && Array.isArray(news.hits)) {
       const searchResults = news.hits.filter((hit) => {
-        if (
-          (hit.title &&
-            hit.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          hit.author.toLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
-          hit.created_at
-            .toLowerCase()
-            .includes(searchTerm.toLocaleLowerCase()) ||
-          hit.points
-            .toString()
-            .toLowerCase()
-            .includes(searchTerm.toLocaleLowerCase())
-        ) {
-          return hit.title;
-        } else {
-          return "";
-        }
+        const attributesToSearch: (keyof typeof hit)[] = [
+          "title",
+          "author",
+          "created_at",
+          "points",
+        ];
+        return attributesToSearch.some((attribute) => {
+          const value = hit[attribute];
+          if (
+            value &&
+            value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+          ) {
+            return true;
+          }
+          return false;
+        });
       });
       displaySearchResult(searchResults);
     } else if (news) {
+      // Render News
       renderNews();
     }
   } catch (err) {
@@ -86,9 +85,13 @@ const renderNews = () => {
         (hit: NewsType["hits"][0]) =>
           `<main >
         <div class="link-item">
-          <a href="${hit.url}" class="link" >
-          <h3>${hit.title}</h3>
-          </a>
+        ${
+          hit.url
+            ? `<a href="${hit.url}" class="link">
+              ${hit.title ? hit.title : "No title"}
+            </a>`
+            : `<a href="${hit.url}" class="link"><h3>${hit._highlightResult.title.value}</h3></a>`
+        }
           <h3>Points: ${hit.points}</h3>
           <h3>Created at: ${formatDate(hit.created_at)}</h3>
           <h3>Exact time: ${hourCreated(hit.created_at)}</h3>
@@ -108,9 +111,13 @@ function displaySearchResult(searchResults: NewsType["hits"][0][]) {
         return `
       <main>
       <div class="link-item">
-      <a href="${hit.url}" class="link" target="_blank">
-      <h3>${hit.title}</h3>
-      </a>
+      ${
+        hit.url
+          ? `<a href="${hit.url}" class="link">
+              ${hit.title ? hit.title : "No title"}
+            </a>`
+          : `<a href="${hit.url}" class="link"><h3>${hit._highlightResult.title.value}</h3></a>`
+      }
       <h3>${hit.points}</h3>
       <h3>${formatDate(hit.created_at)}</h3>
       <p>${hit._highlightResult.author.value} </p>
