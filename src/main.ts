@@ -2,11 +2,9 @@ import "../src/css/style.scss";
 import { getNews } from "./api.ts";
 import { NewsType } from "./news.types.ts";
 import { AxiosError } from "axios";
+import { displaySearchResult } from "./searchFunc.ts";
 
 const newsEl = document.querySelector<HTMLUListElement>("#app")!;
-const searchInput = document.querySelector<HTMLInputElement>("#searchInput");
-const searchButton = document.querySelector<HTMLButtonElement>("#searchButton");
-const searchResult = document.querySelector<HTMLUListElement>("#searchResult")!;
 
 /*  Add event listeners for pagination buttons */
 const prevButton = document.querySelector<HTMLButtonElement>("#prevButton");
@@ -18,20 +16,20 @@ let news: any = [];
 let hitsPages: number = 0;
 
 /* formating date */
-function formatDate(dateString: string): string {
+export const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0"); // Month is 0-indexed
   const day = String(date.getDate()).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
-}
+};
 
 /* formating hour */
-const hourCreated = (dataString: string): string => {
+export const hourCreated = (dataString: string): string => {
   const date = new Date(dataString);
-  const hour = date.getHours();
-  const min = date.getMinutes();
+  const hour = date.getUTCHours();
+  const min = date.getUTCMinutes();
   return `${hour}:${min}`;
 };
 
@@ -68,7 +66,7 @@ nextButton?.addEventListener("click", async (event) => {
 });
 
 /* Get the items from Hacker news Page */
-const getNew = async (searchTerm?: string) => {
+export const getNew = async (searchTerm?: string) => {
   // Fetch todos from server and update local copy
 
   try {
@@ -95,7 +93,9 @@ const getNew = async (searchTerm?: string) => {
           return false;
         });
       });
-      displaySearchResult(searchResults);
+      if (searchResults) {
+        displaySearchResult(searchResults);
+      }
     } else if (news) {
       /*  Render News */
       renderNews(currentPage);
@@ -159,77 +159,22 @@ const renderNews = (page: number) => {
               ${
                 hit.title
                   ? hit.title.length > 50
-                    ? `${hit.title.slice(0, 30)}...`
+                    ? `${hit.title.slice(0, 10)}...`
                     : hit.title
                   : "No title"
               }
             </a>`
-            : `<a href="${hit.url}" class="link"><h3>${hit._highlightResult.title.value}</h3></a>`
+            : `<a href="${hit.story_url}" class="link"><h3>${hit.url}</h3></a>`
         }
-          <h3>Points: ${hit.points}</h3>
-          <h3>Created at: ${formatDate(hit.created_at)}</h3>
+          <h3>Points scored: ${hit.points}</h3>
+          <h3>Date of creation: ${formatDate(hit.created_at)}</h3>
           <h3>Exact time: ${hourCreated(hit.created_at)}</h3>
-          <p>Author: ${hit.author} </p>
+          <p>Created by: ${hit.author} </p>
           </div>
           </main>`
       )
       .join("");
   }
 };
-
-/* Search Render Function */
-function displaySearchResult(searchResults: NewsType["hits"][0][]) {
-  if (searchResults && searchResults.length > 0) {
-    searchResult.innerHTML = searchResults
-      .map((hit) => {
-        return `
-      <main>
-      <div class="link-item">
-      /* Slice link text */
-      ${
-        hit.url
-          ? `<a href="${hit.url}" class="link">
-              ${
-                hit.title
-                  ? hit.title.length > 50
-                    ? `${hit.title.slice(0, 50)}...`
-                    : hit.title
-                  : "No title"
-              }
-            </a>`
-          : `<a href="${hit.url}" class="link"><h3>${hit._highlightResult.title.value}</h3></a>`
-      }
-      <h3>${hit.points}</h3>
-      <h3>${formatDate(hit.created_at)}</h3>
-      <h3>Exact time: ${hourCreated(hit.created_at)}</h3>
-      <p>${hit._highlightResult.author.value} </p>
-      </div>
-      </main>
-      `;
-      })
-      .join("");
-  } else {
-    // Clear the search results if there are no matches
-    searchResult.innerHTML = "<h1>NOT FOUND</h1>";
-  }
-}
-
-/* Handle event listner to button Search */
-searchButton?.addEventListener("click", async () => {
-  const searchTerm = searchInput?.value.trim();
-  if (searchTerm) {
-    getNew(searchTerm);
-  } else {
-    alert("Nothing matched");
-  }
-});
-
-/* Event listner to on click Enter when searching */
-searchInput?.addEventListener("keydown", async (event) => {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    searchButton?.click();
-  }
-});
 
 getNew();
