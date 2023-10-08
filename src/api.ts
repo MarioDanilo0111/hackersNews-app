@@ -7,5 +7,5 @@ const get = async <T>(endpoints: string) => {
 };
 
 export const getNews = () => {
-  return get<NewsType[]>("http://hn.algolia.com/api/v1/search?query=...");
+  return get<NewsType[]>("http://hn.algolia.com/api/v1/search?");
 };

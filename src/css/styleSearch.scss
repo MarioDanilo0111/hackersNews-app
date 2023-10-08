@@ -1,0 +1,60 @@
+$gridComp: rgb(167, 190, 210);
+$h3text: #000;
+
+.input-container {
+  /* display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px; */
+
+  /* #searchInput {
+    width: 300px;
+  } */
+
+  /* input[type="text"] {
+    padding: 10px;
+    border: 6px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    flex: 1;
+  } */
+
+  #prevButton {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 9px;
+    cursor: pointer;
+    font-size: 16px;
+
+    /*  &:hover {
+      background-color: #0056b3;
+    }
+    */
+  }
+}
+
+.link-itemSearch {
+  width: 500px;
+  height: 350px;
+  background-color: $gridComp;
+  border-radius: 30px;
+  padding: 10px;
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  a {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    text-decoration: none;
+    font-size: 1.5em;
+  }
+  h3 {
+    color: $h3text;
+    align-items: center;
+  }
+}
