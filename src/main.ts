@@ -1,19 +1,17 @@
 import "../src/css/style.scss";
 import { getNews } from "./api.ts";
-import { NewsType } from "./news.types.ts";
 import { AxiosError } from "axios";
-import { displaySearchResult } from "./searchFunc.ts";
-
-const newsEl = document.querySelector<HTMLUListElement>("#app")!;
+import displaySearchResult from "./searchFunc.ts";
+import renderNews from "./renderNewsComp.ts";
 
 /*  Add event listeners for pagination buttons */
-const prevButton = document.querySelector<HTMLButtonElement>("#prevButton");
-const nextButton = document.querySelector<HTMLButtonElement>("#nextButton");
-const inputValuePagi =
-  document.querySelector<HTMLInputElement>("#inputValuePagi");
+export const prevButton =
+  document.querySelector<HTMLButtonElement>("#prevButton");
+export const nextButton =
+  document.querySelector<HTMLButtonElement>("#nextButton");
 
-let news: any = [];
-let hitsPages: number = 0;
+export let news: any = [];
+export let hitsPages: number = 0;
 
 /* formating date */
 export const formatDate = (dateString: string): string => {
@@ -33,10 +31,8 @@ export const hourCreated = (dataString: string): string => {
   return `${hour}:${min}`;
 };
 
-/* Number of items per page */
-const itemsPerPage: number = 5;
-/* track the current page */
-let currentPage = 0;
+// /* track the current page */
+export let currentPage = 0;
 
 /*  Function to handle pagination */
 const handlePagination = (direction: "prev" | "next") => {
@@ -66,42 +62,48 @@ nextButton?.addEventListener("click", async (event) => {
 });
 
 /* Get the items from Hacker news Page */
-export const getNew = async (searchTerm?: string) => {
+export const getNew = async (searchTerm?: string | null) => {
   // Fetch todos from server and update local copy
-
-  try {
-    news = await getNews();
-    hitsPages =
-      news && news.hits && Array.isArray(news.hits) ? news.hits.length / 5 : 0;
-    // Add search functionality here
-    if (searchTerm && news && news.hits && Array.isArray(news.hits)) {
-      const searchResults = news.hits.filter((hit: any) => {
-        const attributesToSearch: (keyof typeof hit)[] = [
-          "title",
-          "author",
-          "created_at",
-          "points",
-        ];
-        return attributesToSearch.some((attribute) => {
-          const value = hit[attribute];
-          if (
-            value &&
-            value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-          ) {
-            return true;
-          }
-          return false;
+  /* Handel input value null */
+  if (searchTerm !== null) {
+    try {
+      news = await getNews();
+      hitsPages =
+        news && news.hits && Array.isArray(news.hits)
+          ? news.hits.length / 5
+          : 0;
+      // Add search functionality here
+      if (searchTerm && news && news.hits && Array.isArray(news.hits)) {
+        const searchResults = news.hits.filter((hit: any) => {
+          const attributesToSearch: (keyof typeof hit)[] = [
+            "title",
+            "author",
+            "created_at",
+            "points",
+          ];
+          return attributesToSearch.some((attribute) => {
+            const value = hit[attribute];
+            if (
+              value &&
+              value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+            ) {
+              return true;
+            }
+            return false;
+          });
         });
-      });
-      if (searchResults) {
-        displaySearchResult(searchResults);
+        if (searchResults) {
+          displaySearchResult(searchResults);
+        }
+      } else if (news) {
+        /*  Render News */
+        renderNews(currentPage);
       }
-    } else if (news) {
-      /*  Render News */
-      renderNews(currentPage);
+    } catch (err) {
+      handleFetchError(err);
     }
-  } catch (err) {
-    handleFetchError(err);
+  } else {
+    displaySearchResult(null);
   }
 };
 
@@ -109,6 +111,7 @@ export const getNew = async (searchTerm?: string) => {
 function handleFetchError(err: unknown) {
   if (err instanceof AxiosError) {
     alert("the isAxiosError");
+    getNew;
   } else if (err instanceof Error) {
     alert("The instance of error ocurred" + err.message);
   } else {
@@ -116,65 +119,4 @@ function handleFetchError(err: unknown) {
   }
 }
 
-/* Rendering News */
-const renderNews = (page: number) => {
-  /* if statement to inabilitate buttons */
-  let pa = currentPage + 1;
-  if (prevButton && pa <= 1) {
-    prevButton.disabled = true;
-  } else if (prevButton && pa > 0) {
-    prevButton.disabled = false;
-  }
-
-  if (nextButton && pa == hitsPages) {
-    nextButton.disabled = true;
-  } else if (nextButton && pa < hitsPages) {
-    nextButton.disabled = false;
-  }
-
-  if (inputValuePagi) {
-    inputValuePagi.disabled = true;
-    inputValuePagi.value = `Page nr: ${pa}`;
-  }
-  /*  Calculate the range of news articles to render based on the page number */
-  const startIndex = page * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-
-  if (
-    news &&
-    news.hits &&
-    Array.isArray(news.hits) &&
-    news.hits.length > 0 &&
-    news.hits[0]
-  ) {
-    newsEl.innerHTML = news.hits
-      .slice(startIndex, endIndex)
-      .map(
-        (hit: NewsType["hits"][0]) =>
-          `<main >
-        <div class="link-item">
-        ${
-          hit.url
-            ? `<a href="${hit.url}" class="link">
-              ${
-                hit.title
-                  ? hit.title.length > 50
-                    ? `${hit.title.slice(0, 10)}...`
-                    : hit.title
-                  : "No title"
-              }
-            </a>`
-            : `<a href="${hit.story_url}" class="link"><h3>${hit.url}</h3></a>`
-        }
-          <h3>Points scored: ${hit.points}</h3>
-          <h3>Date of creation: ${formatDate(hit.created_at)}</h3>
-          <h3>Exact time: ${hourCreated(hit.created_at)}</h3>
-          <p>Created by: ${hit.author} </p>
-          </div>
-          </main>`
-      )
-      .join("");
-  }
-};
-
-getNew();
+export default getNew();
