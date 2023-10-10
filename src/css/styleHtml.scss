@@ -1,47 +1,20 @@
 /* variable color */
 $backGround: peru;
 $textColor: #fff;
+
+@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@600&display=swap");
+
 /* body */
 .body {
   background: $backGround;
   .container {
-    color: $textColor;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
   }
-}
-
-/* Input field container */
-.input-container {
-  /* display: flex;
-  align-items: center;
-  margin-bottom: 20px; */
-
-  /* #searchInput {
-    width: 300px;
-  } */
-
-  /*  input[type="text"] {
-    padding: 10px;
-    border: 6px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-    flex: 1;
-  } */
-
-  #prevButton {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 9px;
-    cursor: pointer;
-    font-size: 16px;
-
-    &:hover {
-      background-color: #0056b3;
-    }
+  h1 {
+    color: $textColor;
+    font-family: "Oswald", sans-serif;
   }
 }

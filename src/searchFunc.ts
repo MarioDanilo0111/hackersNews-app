@@ -22,7 +22,7 @@ function displaySearchResult(searchResults?: NewsType["hits"][0][] | null) {
               ${
                 hit.title
                   ? hit.title.length > 30
-                    ? `${hit.title.slice(0, 13)}...`
+                    ? `${hit.title.slice(0, 30)}...`
                     : hit.title
                   : "No title"
               }
