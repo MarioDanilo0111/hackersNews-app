@@ -6,8 +6,8 @@ $textColor: #fff;
   background: $backGround;
   .container {
     color: $textColor;
-    margin: 30px 600px;
     display: flex;
+    align-items: center;
     justify-content: center;
     flex-wrap: wrap;
   }

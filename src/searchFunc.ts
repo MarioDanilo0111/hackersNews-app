@@ -1,15 +1,14 @@
 /* Search Render Function */
 import "./css/styleSearch.scss";
-import { getNew } from "./main.ts";
-import { formatDate } from "./main.ts";
-import { hourCreated } from "./main.ts";
+import { getNew, formatDate, hourCreated } from "./main.ts";
+
 import { NewsType } from "./news.types.ts";
 
 const searchInput = document.querySelector<HTMLInputElement>("#searchInput");
 const searchButton = document.querySelector<HTMLButtonElement>("#searchButton");
 const searchResult = document.querySelector<HTMLUListElement>("#searchResult")!;
 
-export function displaySearchResult(searchResults: NewsType["hits"][0][]) {
+function displaySearchResult(searchResults?: NewsType["hits"][0][] | null) {
   if (searchResults && searchResults.length > 0) {
     searchResult.innerHTML = searchResults
       .map((hit) => {
@@ -33,15 +32,17 @@ export function displaySearchResult(searchResults: NewsType["hits"][0][]) {
       <h3>Points scored: ${hit.points}</h3>
       <h3>Date of creation: ${formatDate(hit.created_at)}</h3>
       <h3>Exact time: ${hourCreated(hit.created_at)}</h3>
-      <h3>Created by: ${hit._highlightResult.author.value} </h3>
+      <h3>Created by: ${hit.author} </h3>
       </div>
       </main>
       `;
       })
       .join("");
+  } else if (searchResults === null) {
+    searchResult.innerHTML = "";
   } else {
     // Clear the search results if there are no matches
-    searchResult.innerHTML = "<h1>NOT FOUND</h1>";
+    searchResult.innerHTML = "<h1>SEARCH NOT FOUND</h1>";
   }
 }
 
@@ -52,7 +53,7 @@ searchButton?.addEventListener("click", async () => {
     getNew(searchTerm);
     searchTerm = "";
   } else {
-    alert("Nothing matched");
+    getNew(null);
   }
 });
 
@@ -65,3 +66,4 @@ searchInput?.addEventListener("keydown", async (event) => {
     searchInput.value = "";
   }
 });
+export default displaySearchResult;
