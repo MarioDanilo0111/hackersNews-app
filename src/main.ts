@@ -31,7 +31,7 @@ export const hourCreated = (dataString: string): string => {
   return `${hour}:${min}`;
 };
 
-// /* track the current page */
+/* track the current page */
 export let currentPage = 0;
 
 /*  Function to handle pagination */

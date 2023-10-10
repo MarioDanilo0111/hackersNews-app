@@ -1,13 +1,13 @@
+/* variable color */
 $gridComp: antiquewhite;
 $h3text: #000;
 
 .link-item {
-  width: 500px;
-  height: 350px;
+  border: 10px;
   background-color: $gridComp;
   border-radius: 30px;
-  padding: 10px;
-  margin: 20px;
+  padding: 60px;
+  margin: 10px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -17,10 +17,12 @@ $h3text: #000;
     align-items: center;
     flex-direction: column;
     text-decoration: none;
-    font-size: 1.5em;
+    font-size: 1.6rem;
+    text-decoration: underline;
   }
   h3 {
     color: $h3text;
     align-items: center;
+    font-size: 1.6em;
   }
 }

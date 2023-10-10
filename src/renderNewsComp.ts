@@ -12,7 +12,7 @@ import {
 
 /* To render  */
 const newsEl = document.querySelector<HTMLUListElement>("#app")!;
-/* Page number */
+/* Page number to render */
 const inputValuePagi =
   document.querySelector<HTMLInputElement>("#inputValuePagi");
 
@@ -23,7 +23,7 @@ news = await getNews();
 const itemsPerPage: number = 5;
 
 function renderNews(page: number) {
-  /* if statement to inabilitate buttons */
+  /* if statement to inabilitate buttons, pagination */
   let pa = currentPage + 1;
   if (prevButton && pa <= 1) {
     prevButton.disabled = true;
@@ -63,7 +63,7 @@ function renderNews(page: number) {
             ? `<a href="${hit.url}" class="link">
               ${
                 hit.title
-                  ? hit.title.length > 50
+                  ? hit.title.length > 30
                     ? `${hit.title.slice(0, 30)}...`
                     : hit.title
                   : "No title"
